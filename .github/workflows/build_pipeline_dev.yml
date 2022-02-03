@@ -14,7 +14,6 @@ on:
   
 env:
   SOURCECODE_MANAGE_BRANCH: develop
-  TARGET_ENV: develop
   GITLAB_REPO: git.g-able.com/ais-esaving/service-a.git
   GITLAB_HOME_PATH: service-a
   POM_VERSION_LINE_NUMBER: 13
@@ -30,8 +29,43 @@ jobs:
     
     steps:
       - name: Checkout GitOps Repo
-        run: |
-          echo "path: manage_gitops"
-          echo "ref: ${{ env.GITOPS_MANAGE_BRANCH }}"
-          echo "repository: ${{ secret.GITOPS_REPO }}"
+        uses: actions/checkout@v2.4.0
+        with:
+          repository: ${{ secrets.GITOPS_REPO }}
+          ref: ${{ env.GITOPS_MANAGE_BRANCH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: manage_gitops
       
+      - name: Geneate new Build Number
+        run: |
+            cd manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}
+            cur_build_number=$(cat version_control.txt|grep '^BUILD_VERSION'|awk -F'=' '{print($2)}')
+            echo "cur_build_number=${cur_build_number}"
+            ((new_build_number=cur_build_number+1))
+            echo "new_build_number=${new_build_number}"
+            echo "BUILD_VERSION=${new_build_number}" > version_control.txt
+            echo "BUILD_VERSION=${new_build_number} " >> $GITHUB_ENV
+
+      - name: Checkout Source Code
+        run: |
+            git clone https://${{ secrets.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@${{ env.GITLAB_REPO }}
+            cd ${{ env.GITLAB_HOME_PATH }}
+            git switch ${{ env.SOURCECODE_MANAGE_BRANCH }}
+            
+          
+      - name: Generate new version
+        run: |
+            cd ${{ env.GITLAB_HOME_PATH }}
+            pom_version=$(head -${{ env.POM_VERSION_LINE_NUMBER }} pom.xml|tail -1|grep -oPm1 "(?<=<version>)[^<]+")
+            echo "pom_version=${pom_version}"
+            echo "POM_VERSION=${pom_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
+            new_image_version="${pom_version}-${{ env.BUILD_VERSION }}"
+            echo "new_image_version=${new_image_version}"
+            echo "POM_VERSION=${new_image_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
+
+
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt   
