@@ -37,7 +37,7 @@ jobs:
         with:
           repository: ${{ secrets.GITOPS_REPO }}
           ref: ${{ env.GITOPS_MANAGE_BRANCH }}
-          token: ${{ secrets.GITOPS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: manage_gitops
       
       - name: Geneate new Build Number
