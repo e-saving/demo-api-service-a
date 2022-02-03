@@ -73,7 +73,7 @@ jobs:
           name: version
           path: manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt   
 
-  build-container:
+  build-container-image:
     runs-on: ubuntu-latest    
     needs: [generate-version]
     environment: develop
@@ -157,9 +157,9 @@ jobs:
         with:
           sarif_file: results.sarif
           
-  update-gitops-repo:
+  update-deployment-configuration:
     runs-on: ubuntu-latest    
-    needs: [build-container]
+    needs: [build-container-image]
     environment: develop
     
     steps:          
