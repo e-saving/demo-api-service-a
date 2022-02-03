@@ -65,7 +65,7 @@ jobs:
             echo "POM_VERSION=${pom_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
             new_image_version="${pom_version}-${{ env.BUILD_VERSION }}"
             echo "new_image_version=${new_image_version}"
-            echo "POM_VERSION=${new_image_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
+            echo "IMAGE_VERSION=${new_image_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
 
 
       - name: Upload version artifact
