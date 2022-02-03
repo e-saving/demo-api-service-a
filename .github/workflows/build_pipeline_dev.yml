@@ -213,14 +213,18 @@ jobs:
             echo "image_name=${image_name}"
             echo "image_tag=${image_tag}"
             
-      
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: version/values.yaml  
          
       - name: Commit and push deployment configuration (Helm)
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
         with:
-          source_file: "version/*"
+          source_file: "version/"
           destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
           destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
           destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
