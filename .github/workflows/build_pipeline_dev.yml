@@ -198,6 +198,7 @@ jobs:
             new_acr_val="${{ secrets.ACR_DEV_REGISTRY_SERVER }}"
             sed -i "s/${image_val}/${new_image_val}/g" values.yaml
             sed -i "s/${acr_val}/${new_acr_val}/g" values.yaml
+            cp values.yaml ../../version/
             
       - name: Verify updated deployment configuration (Helm)
         run: | 
@@ -211,13 +212,15 @@ jobs:
             echo "image_val=${image_val}"
             echo "image_name=${image_name}"
             echo "image_tag=${image_tag}"
+            
+      
          
       - name: Commit and push deployment configuration (Helm)
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
         with:
-          source_file: "manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/values.yaml"
+          source_file: "version/*"
           destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
           destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
           destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
