@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Checkout GitOps Repo
         run: |        
-          echo "repository: ${{ secret.GITOPS_REPO }}"
+          #echo "repository: ${{ secret.GITOPS_REPO }}"
           echo "ref: ${{ env.GITOPS_MANAGE_BRANCH }}"
           echo "token: ${{ secrets.GITHUB_TOKEN }}"
           echo "path: manage_gitops"
