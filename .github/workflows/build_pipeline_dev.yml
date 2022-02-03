@@ -121,6 +121,8 @@ jobs:
         run: |
           cd ${{ env.GITLAB_HOME_PATH }}
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+          ls -la
+          ls -la .scannerwork/
       
       - name: Check Code Quality Gate (SonarQube)
         uses: SonarSource/sonarqube-quality-gate-action@v1.0.0
@@ -130,14 +132,14 @@ jobs:
         with:
           scanMetadataReportFile: ${{ env.GITLAB_HOME_PATH }}/.scannerwork/report-task.txt
             
-      - name: Log in to Azure Container Registry
+      - name: Log in to Azure Container Registry (ACR)
         uses: azure/docker-login@v1
         with:
             login-server: ${{ secrets.CONTAINER_REGISTRY }}
             username: ${{ secrets.ACR_USERNAME }}
             password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push Container Image
+      - name: Build and Push Container Image (ACR)
         run: |
             cd ${{ env.GITLAB_HOME_PATH }}
             ls -l
@@ -157,7 +159,7 @@ jobs:
           # Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result.  Valid choices are "negligible", "low", "medium", "high" and "critical".  Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".
           severity-cutoff: critical # optional, default is medium
 
-      - name: Upload Container Image Scan Report
+      - name: Upload Container Image Scan Report (Anchore)
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: results.sarif
