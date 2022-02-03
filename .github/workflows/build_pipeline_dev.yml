@@ -218,7 +218,7 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
         with:
           source_file: "manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/values.yaml"
-          destination_repo: ${{ env.GITOPS_REPO_DEV }}
+          destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
           destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
           destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
           user_email: 'github_actions@g-able.com'
