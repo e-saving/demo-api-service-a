@@ -14,10 +14,14 @@ on:
   
 env:
   SOURCECODE_MANAGE_BRANCH: develop
+  
   GITLAB_REPO: git.g-able.com/ais-esaving/service-a.git
   GITLAB_HOME_PATH: service-a
+  
   POM_VERSION_LINE_NUMBER: 13
+  
   CONTAINER_REPO: gableesaving.azurecr.io/api-demo-service-a
+  
   GITOPS_MANAGE_BRANCH: develop
   GITOPS_MANAGE_HOME_PATH: api-demo-service-a
   
