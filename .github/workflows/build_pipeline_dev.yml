@@ -73,8 +73,6 @@ jobs:
           name: version
           path: manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt   
 
-
-          
   update-deployment-configuration:
     runs-on: ubuntu-latest    
     needs: [generate-version]
@@ -116,8 +114,7 @@ jobs:
             new_image_val="${image_name}:${{ env.IMAGE_VERSION }}"
             new_acr_val="${{ secrets.ACR_DEV_REGISTRY_SERVER }}"
             sed -i "s/${image_val}/${new_image_val}/g" values.yaml
-            sed -i "s/${acr_val}/${new_acr_val}/g" values.yaml
-            cp values.yaml ../../version/
+            sed -i "s/${acr_val}/${new_acr_val}/g" values.yaml            
             
       - name: Verify updated deployment configuration (Helm)
         run: | 
@@ -136,17 +133,30 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: version
-          path: version/values.yaml  
-         
+          path: manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/values.yaml
+          
       - name: Commit and push deployment configuration (Helm)
         uses: dmnemec/copy_file_to_another_repo_action@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
         with:
-          source_file: version/values.yaml;version/version_control.txt
+          source_file: manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/values.yaml
           destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
           destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
           destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
           user_email: 'github_actions@g-able.com'
           user_name: 'github_actions'
           commit_message: 'Update new container image version ${{ env.IMAGE_VERSION }} of ${{ env.GITOPS_MANAGE_HOME_PATH }}/values.yaml'
+         
+      - name: Commit and push version control file (GitOps Repo)
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
+        with:
+          source_file: version/version_control.txt
+          destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
+          destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
+          destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
+          user_email: 'github_actions@g-able.com'
+          user_name: 'github_actions'
+          commit_message: 'Update new container image version ${{ env.IMAGE_VERSION }} of ${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt'
