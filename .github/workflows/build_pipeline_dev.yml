@@ -113,14 +113,20 @@ jobs:
             ls -l target
             #ls -l target/site/jacoco/
 
+      #- name: Scan Source Code Quality (SonarQube)
+      #  uses: SonarSource/sonarqube-scan-action@v1.0.0
+      #  env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #  with:         
+      #    args: -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+      #    projectBaseDir: ${{ env.GITLAB_HOME_PATH }}   
+          
       - name: Scan Source Code Quality (SonarQube)
-        uses: SonarSource/sonarqube-scan-action@v1.0.0
-        env:
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:         
-          args: -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-          projectBaseDir: ${{ env.GITLAB_HOME_PATH }}   
+        run: |
+            cd ${{ env.GITLAB_HOME_PATH }}
+            mvn sonar:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            ls -l target/                      
       
       - name: Check Code Quality Gate (SonarQube)
         uses: SonarSource/sonarqube-quality-gate-action@v1.0.0
@@ -128,7 +134,7 @@ jobs:
         env:
          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          scanMetadataReportFile: ${{ env.GITLAB_HOME_PATH }}/.scannerwork/report-task.txt
+          scanMetadataReportFile: ${{ env.GITLAB_HOME_PATH }}/target/sonar/report-task.txt
             
       - name: Log in to Azure Container Registry (ACR)
         uses: azure/docker-login@v1
