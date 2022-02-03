@@ -26,10 +26,11 @@ env:
 jobs:
   generate-version:
     runs-on: ubuntu-latest
-    #environment: develop
+    environment: develop
     
     steps:
       - name: Checkout GitOps Repo
-        run: |         
-          echo "path: manage_gitops"          
+        run: |
+          echo "path: manage_gitops"
+          echo "ref: ${{ env.GITOPS_MANAGE_BRANCH }}"
       
