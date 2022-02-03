@@ -143,7 +143,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.GITOPS_TOKEN }}
         with:
-          source_file: "version/values.yaml version/version_control.txt "
+          source_file: version/values.yaml,version/version_control.txt
           destination_repo: ${{ secrets.GITOPS_REPO_DEV }}
           destination_folder: ${{ env.GITOPS_MANAGE_HOME_PATH }}
           destination_branch: ${{ env.GITOPS_MANAGE_BRANCH }}
