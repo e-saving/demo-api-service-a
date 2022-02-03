@@ -13,7 +13,8 @@ on:
   workflow_dispatch:
   
 env:
-  SOURCECODE_MANAGE_BRANCH: main
+  #default is develop
+  SOURCECODE_MANAGE_BRANCH: main 
 
   GITLAB_REPO: git.g-able.com/ais-esaving/service-a.git
   GITLAB_HOME_PATH: service-a
