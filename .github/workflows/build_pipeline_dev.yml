@@ -15,11 +15,13 @@ on:
 env:
   #default is develop
   SOURCECODE_MANAGE_BRANCH: main 
-
-  GITLAB_REPO: git.g-able.com/ais-esaving/service-a.git
-  GITLAB_HOME_PATH: service-a
+  SOURCECODE_HOME_PATH: service-a
+  
+  GITLAB_REPO: git.g-able.com/ais-esaving/service-a.git 
   
   POM_VERSION_LINE_NUMBER: 13
+  
+  SONAR_PROJECT_KEY: api-demo-service-a
   
   DOCKER_IMAGE_NAME: api-demo-service-a
   
@@ -54,12 +56,12 @@ jobs:
       - name: Checkout Source Code
         run: |
             git clone https://${{ secrets.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@${{ env.GITLAB_REPO }}
-            cd ${{ env.GITLAB_HOME_PATH }}
+            cd ${{ env.SOURCECODE_HOME_PATH }}
             git switch ${{ env.SOURCECODE_MANAGE_BRANCH }}
                       
       - name: Generate new version
         run: |
-            cd ${{ env.GITLAB_HOME_PATH }}
+            cd ${{ env.SOURCECODE_HOME_PATH }}
             pom_version=$(head -${{ env.POM_VERSION_LINE_NUMBER }} pom.xml|tail -1|grep -oPm1 "(?<=<version>)[^<]+")
             echo "pom_version=${pom_version}"
             echo "POM_VERSION=${pom_version}" >> ../manage_gitops/${{ env.GITOPS_MANAGE_HOME_PATH }}/version_control.txt
@@ -83,7 +85,7 @@ jobs:
       - name: Checkout Source Code
         run: |
             git clone https://${{ secrets.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@${{ env.GITLAB_REPO }}
-            cd ${{ env.GITLAB_HOME_PATH }}
+            cd ${{ env.SOURCECODE_HOME_PATH }}
             git switch ${{ env.SOURCECODE_MANAGE_BRANCH }}
           
       - name: Set up JDK 11
@@ -105,7 +107,7 @@ jobs:
           
       - name: Build with Maven
         run: |
-            cd ${{ env.GITLAB_HOME_PATH }}            
+            cd ${{ env.SOURCECODE_HOME_PATH }}            
             #mkdir -p badges
             #mvn package -Pcoverage
             mvn package            
@@ -115,8 +117,8 @@ jobs:
           
       - name: Scan Source Code Quality (SonarQube)
         run: |
-            cd ${{ env.GITLAB_HOME_PATH }}
-            mvn sonar:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            cd ${{ env.SOURCECODE_HOME_PATH }}
+            mvn sonar:sonar -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       
       - name: Check Code Quality Gate (SonarQube)
         uses: SonarSource/sonarqube-quality-gate-action@v1.0.0
@@ -124,7 +126,7 @@ jobs:
         env:
          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          scanMetadataReportFile: ${{ env.GITLAB_HOME_PATH }}/target/sonar/report-task.txt
+          scanMetadataReportFile: ${{ env.SOURCECODE_HOME_PATH }}/target/sonar/report-task.txt
             
       - name: Log in to Azure Container Registry (ACR)
         uses: azure/docker-login@v1
@@ -135,7 +137,7 @@ jobs:
 
       - name: Build and Push Container Image (ACR)
         run: |
-            cd ${{ env.GITLAB_HOME_PATH }}
+            cd ${{ env.SOURCECODE_HOME_PATH }}
             ls -l
             docker build . -t ${{ secrets.ACR_DEV_REGISTRY_SERVER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_VERSION }}
             docker push ${{ secrets.ACR_DEV_REGISTRY_SERVER }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_VERSION }}
