@@ -153,7 +153,7 @@ jobs:
           # Set to false to avoid failing based on severity-cutoff. Default is to fail when severity-cutoff is reached (or surpassed)
           fail-build: false # optional, default is true      
           # Optionally specify the minimum vulnerability severity to trigger an "error" level ACS result.  Valid choices are "negligible", "low", "medium", "high" and "critical".  Any vulnerability with a severity less than this value will lead to a "warning" result.  Default is "medium".
-          severity-cutoff: critical # optional, default is medium
+          #severity-cutoff: critical # optional, default is medium
 
       - name: Upload Container Image Scan Report (Anchore)
         uses: github/codeql-action/upload-sarif@v1
